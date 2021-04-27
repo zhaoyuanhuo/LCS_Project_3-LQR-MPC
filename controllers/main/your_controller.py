@@ -269,11 +269,8 @@ class CustomController(BaseController):
                       [2*Ca*lf/Iz, 0.0]])
 
         # solve DT LQR tracking problem
-        K = np.zeros((2,4))
-        S = self.Q.copy()
-        for k in range(self.N-1, -1, -1):
-            K = inv(self.R + B.T * S * B) * B.T * S * A
-            S = (A-B*K).T * S * (A-B*K) + self.Q + K.T*self.R*K
+        K = np.array([[0.9242 0.4440 2.1869 0.5331],
+                      [0, 0, 0, 0]])
 
         # get controls
         sys_control_next = np.matmul(K, self.error_state)
