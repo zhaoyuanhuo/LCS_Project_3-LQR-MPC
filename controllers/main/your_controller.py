@@ -56,18 +56,12 @@ class CustomController(BaseController):
         self.delta = 0.0
         self.F = 0.0
 
-        # LQR
-        self.N = 100
-        self.Qt = np.array([[10.0, 0.0, 0.0, 0.0],
-                           [0.0, 2.0, 0.0, 0.0],
-                           [0.0, 0.0, 10.0, 0.0],
-                           [0.0, 0.0, 0.0, 2.0]])
-        self.Q = np.array([[1.0, 0.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0, 0.0],
-                           [0.0, 0.0, 1.0, 0.0],
-                           [0.0, 0.0, 0.0, 1.0]])
-        self.R = np.array([1.0, 0.0],
-                          [0.0, 1.0])
+        # LQR gains (computed in MATLAB)
+        self.K = np.array([[0.0057, 0.0234, 0.1303, 0.1265],
+                           [0, 0, 0, 0]])
+        # self.K = np.array([[0.001, 0.0001, 1.0, 0.1],
+        #                    [0.0, 0.0, 0.0, 0.0]])
+        self.delta_last = -100.0
 
         self.XTE_straight = 0.0
         self.XTE_small_angle = 0.0
@@ -190,7 +184,7 @@ class CustomController(BaseController):
             self.kd_x = 2.0
             self.lat_look_ahead = 100
         elif np.abs(error_psi_long) < 45 * math.pi / 180:  # medium
-            print("median angle is", np.abs(error_psi_long)*180/math.pi)
+            # print("median angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
             self.XTE_medium_angle += XTE
 
@@ -199,7 +193,7 @@ class CustomController(BaseController):
             self.long_look_ahead = 650
             self.lat_look_ahead = 125
         elif np.abs(error_psi_long) < 55 * math.pi / 180:  # medium
-            print("median-large angle is", np.abs(error_psi_long)*180/math.pi)
+            # print("median-large angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
             self.XTE_medium_angle += XTE
 
@@ -233,6 +227,7 @@ class CustomController(BaseController):
         # compute e1, e2 e1dot e2dot
         # compute e1
         e1 = np.sqrt((X - X_next_ref)**2 + (Y - Y_next_ref)**2)
+        # e1 = XTE
         XY_center = np.sqrt((X - self.track_center[0])**2 + (Y - self.track_center[1])**2)
         XY_ref_center = np.sqrt((trajectory[nn_idx][0] - self.track_center[0])**2 + (trajectory[nn_idx][1] - self.track_center[1])**2)
         # XY_ref_center = np.sqrt((X_next_ref - self.track_center[0])**2 + (Y_next_ref - self.track_center[1])**2)
@@ -247,36 +242,42 @@ class CustomController(BaseController):
         e2 = - self.wrapAngle(psi) + self.wrapAngle(psi_ref)
         e2 = wrapToPi(e2)
         # compute e1dot
-        e1dot = (e1 - self.error_state[0][0]) / delT
+        e1dot = (e1 - self.error_state[0][0])/0.2
         # compute e2dot
-        e2dot = (e2 - self.error_state[2][0]) / delT
+        e2dot = (e2 - self.error_state[2][0])/0.2
         # print("[psi, psi ref] = ", psi, " ", psi_ref)
         # print("states: ", e1, " ", e2, " ", e1dot, " ", e2dot)
         # form the error state
         self.error_state[0][0] = e1
         self.error_state[1][0] = e1dot
-        self.error_state[2][0] = e2
-        self.error_state[3][0] = e2dot
-
-        # linearize the system about current state ==> get A and B
-        A = np.array([[0.0, 1.0, 0.0, 0.0],
-                      [0.0, -4*Ca/(m*xdot), 4*Ca/m, -2*Ca*(lf-lr)/(m*xdot)],
-                      [0.0, 0.0, 0.0, 1.0],
-                      [0.0, -2*Ca*(lf-lr)/(Iz*xdot), 2*Ca*(lf-lr)/Iz, -2*Ca*(lf*lf+lr*lr)/(Iz*xdot)]])
-        B = np.array([[0.0, 0.0],
-                      [2*Ca/m, 0.0],
-                      [0.0, 0.0],
-                      [2*Ca*lf/Iz, 0.0]])
+        self.error_state[2][0] = -e2
+        self.error_state[3][0] = -e2dot
 
         # solve DT LQR tracking problem
-        K = np.array([[0.9242 0.4440 2.1869 0.5331],
-                      [0, 0, 0, 0]])
+        # K are computed in MATLAB
 
         # get controls
-        sys_control_next = np.matmul(K, self.error_state)
+        sys_control_next = np.matmul(self.K, self.error_state)
         delta = - sys_control_next[0][0]
         delta = clamp(delta, self.delta_min, self.delta_max)
         # print(delta)
+        if self.delta_last == -100.0:
+            print("first timestep")
+            self.delta_last = delta
+        else:
+            if abs(e2)<0.03:
+                # print("clamp 0.03!", abs(e2))
+                delta = clamp(delta, self.delta_last-0.025, self.delta_last+0.025)
+            elif abs(e2)<0.05:
+                # print("clamp! 0.05", abs(e2))
+                delta = clamp(delta, self.delta_last-0.04, self.delta_last+0.04)
+            elif abs(e2)<0.08:
+                # print("clamp! 0.8", abs(e2))
+                delta = clamp(delta, self.delta_last-0.07, self.delta_last+0.07)
+            else:
+                # print("clamp! over", abs(e2))
+                delta = clamp(delta, self.delta_last-0.1, self.delta_last+0.1)
+            self.delta_last = delta
 
         # ---------------|Longitudinal Controller|-------------------------
         """
@@ -297,7 +298,7 @@ class CustomController(BaseController):
         # performance printout
         # self.performance_printout()
 
-
+        # print(e1, " ", e1dot, " ", e2, " ", e2dot, " ", F, " ", delta)
         # Return all states and calculated control inputs (F, delta)
         return X, Y, xdot, ydot, psi, psidot, F, delta
 
