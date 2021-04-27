@@ -8,8 +8,6 @@ from util import *
 
 import math
 from numpy.linalg import inv
-import scipy
-import control
 
 # CustomController class (inherits from BaseController)
 class CustomController(BaseController):
@@ -58,16 +56,11 @@ class CustomController(BaseController):
         self.delta = 0.0
         self.F = 0.0
 
-        # LQR param
-        self.N = 200
-        self.Q = np.array([[0.0001, 0, 0, 0],
-                           [0, 0.000001, 0, 0],
-                           [0, 0, 0.001, 0],
-                           [0, 0, 0, 0.00001]])
-        self.R = np.array([[3, 0],
-                           [0, 0.0001]])
-
-
+        # LQR gains (computed in MATLAB)
+        self.K = np.array([[0.0057, 0.0234, 0.1303, 0.1265],
+                           [0, 0, 0, 0]])
+        # self.K = np.array([[0.001, 0.0001, 1.0, 0.1],
+        #                    [0.0, 0.0, 0.0, 0.0]])
         self.delta_last = -100.0
 
         self.XTE_straight = 0.0
@@ -260,31 +253,11 @@ class CustomController(BaseController):
         self.error_state[2][0] = -e2
         self.error_state[3][0] = -e2dot
 
-        # solve DT MPC
-        # CT system
-        Ac = np.array([[0, 1, 0, 0],
-                      [0, -4*Ca/(m*xdot), 4*Ca/m, -2*Ca*(lf-lr)/(m*xdot)],
-                      [0, 0, 0, 1],
-                      [0, -2*Ca*(lf-lr)/(Iz*xdot), 2*Ca*(lf-lr)/Iz, -2*Ca*(lf*lf+lr*lr)/(Iz*xdot)]])
-        Bc = np.array([[0, 0],
-                       [2*Ca/m, 0],
-                       [0, 0],
-                       [2*Ca*lf/Iz, 0]])
-        # CT2DT
-        sysc = control.StateSpace(Ac, Bc, np.identity(4), 0)
-        sysd = control.c2d(sysc, delT)
-        A = sysd.A
-        B = sysd.B
+        # solve DT LQR tracking problem
+        # K are computed in MATLAB
 
-        # riccati backward pass
-        S = np.copy(self.Q)
-        K = np.zeros((2,4))
-        for i in range(self.N):
-            K = inv(self.R + B.T@S@B) @ B.T @ S @ A
-            S = (A-B@K).T @ S @ (A-B@K) + self.Q + K.T@self.R@K
-
-        # get controls: execute the first control
-        sys_control_next = np.matmul(K, self.error_state)
+        # get controls
+        sys_control_next = np.matmul(self.K, self.error_state)
         delta = - sys_control_next[0][0]
         delta = clamp(delta, self.delta_min, self.delta_max)
         # print(delta)
@@ -328,4 +301,3 @@ class CustomController(BaseController):
         # print(e1, " ", e1dot, " ", e2, " ", e2dot, " ", F, " ", delta)
         # Return all states and calculated control inputs (F, delta)
         return X, Y, xdot, ydot, psi, psidot, F, delta
-

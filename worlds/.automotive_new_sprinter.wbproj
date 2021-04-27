@@ -6,7 +6,7 @@ minimizedPerspectives: 000000ff00000000fd00000003000000000000016c00000469fc02000
 maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
-textFiles: 0 "controllers/main/your_controller.py"
+textFiles: 0 "controllers/main/your_controller.py" "../.local/lib/python3.8/site-packages/numpy/linalg/linalg.py"
 consoles: Console:All:All
 renderingDevicePerspectives: Mercedes-Benz Sprinter:console;1;1;0;0
 renderingDevicePerspectives: Mercedes-Benz Sprinter:speedometer;1;1;0;0
