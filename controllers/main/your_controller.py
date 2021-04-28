@@ -249,9 +249,9 @@ class CustomController(BaseController):
         e2 = - self.wrapAngle(psi) + self.wrapAngle(psi_ref)
         e2 = wrapToPi(e2)
         # compute e1dot
-        e1dot = (e1 - self.error_state[0][0])/0.2
+        e1dot = (e1 - self.error_state[0][0])/0.1
         # compute e2dot
-        e2dot = (e2 - self.error_state[2][0])/0.2
+        e2dot = (e2 - self.error_state[2][0])/0.1
         # print("[psi, psi ref] = ", psi, " ", psi_ref)
         # print("states: ", e1, " ", e2, " ", e1dot, " ", e2dot)
         # form the error state
