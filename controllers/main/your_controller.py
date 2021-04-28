@@ -182,6 +182,14 @@ class CustomController(BaseController):
             longi_scale = 4.0
             self.kd_x = 5.0
             self.lat_look_ahead = 60
+
+            self.N = 250
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         elif np.abs(error_psi_long) < 30 * math.pi / 180:  # curb
             # print("small angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_small_angle += 1
@@ -190,6 +198,14 @@ class CustomController(BaseController):
             longi_scale = 0.8
             self.kd_x = 2.0
             self.lat_look_ahead = 100
+
+            self.N = 200
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         elif np.abs(error_psi_long) < 45 * math.pi / 180:  # medium
             # print("median angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
@@ -199,6 +215,14 @@ class CustomController(BaseController):
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 125
+
+            self.N = 200
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         elif np.abs(error_psi_long) < 55 * math.pi / 180:  # medium
             # print("median-large angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
@@ -208,6 +232,15 @@ class CustomController(BaseController):
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 150
+
+
+            self.N = 200
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         elif np.abs(error_psi_long) < 85 * math.pi / 180:  # curb
             # print("large angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_large_angle += 1
@@ -217,6 +250,14 @@ class CustomController(BaseController):
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 200
+
+            self.N = 200
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         else:
             # print("super large angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_super_large_angle += 1
@@ -226,6 +267,14 @@ class CustomController(BaseController):
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 200
+
+            self.N = 200
+            self.Q = np.array([[0.0001, 0, 0, 0],
+                               [0, 0.000001, 0, 0],
+                               [0, 0, 0.001, 0],
+                               [0, 0, 0, 0.00001]])
+            self.R = np.array([[3, 0],
+                               [0, 0.0001]])
         # ---------------|Lateral Controller|-------------------------
         """
         Please design your lateral controller below.
