@@ -195,7 +195,7 @@ class CustomController(BaseController):
             self.cnt_small_angle += 1
             self.XTE_small_angle += XTE
 
-            longi_scale = 0.8
+            longi_scale = 0.7
             self.kd_x = 2.0
             self.lat_look_ahead = 100
 
@@ -228,7 +228,7 @@ class CustomController(BaseController):
             self.cnt_medium_angle += 1
             self.XTE_medium_angle += XTE
 
-            longi_scale = 0.5
+            longi_scale = 0.3
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 150
@@ -246,7 +246,7 @@ class CustomController(BaseController):
             self.cnt_large_angle += 1
             self.XTE_large_angle += XTE
 
-            longi_scale = 0.5
+            longi_scale = 0.3
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 200
@@ -263,7 +263,7 @@ class CustomController(BaseController):
             self.cnt_super_large_angle += 1
             self.XTE_super_large_angle += XTE
 
-            longi_scale = 0.5
+            longi_scale = 0.2
             self.kd_x = 0.0
             self.long_look_ahead = 650
             self.lat_look_ahead = 200
