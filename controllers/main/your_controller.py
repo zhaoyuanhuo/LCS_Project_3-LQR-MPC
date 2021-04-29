@@ -134,7 +134,6 @@ class CustomController(BaseController):
         # preprocessing the reference trajectory
         # lateral preprocessing
         long_look_ahead = self.long_look_ahead
-        ### !!! change this
         lat_look_ahead = self.lat_look_ahead
         XTE, nn_idx = closestNode(X, Y, trajectory)
         nn_lat_next_idx = nn_idx + lat_look_ahead
@@ -151,11 +150,8 @@ class CustomController(BaseController):
             Y_next_ref += trajectory[nn_lat_next_idx][1]
         X_next_ref /= cnt
         Y_next_ref /= cnt
-        # X_next_ref = trajectory[nn_lat_next_idx][0]
-        # Y_next_ref = trajectory[nn_lat_next_idx][1]
         psi_ref = math.atan2(Y_next_ref - Y, X_next_ref - X)
         speed_scale = 1.0
-        longi_scale = 1.0
 
         # longitude lookahead
         #   1. comparing with current psi, to determine if there is a curb ahead
@@ -182,7 +178,7 @@ class CustomController(BaseController):
             longi_scale = 4.0
             self.kd_x = 5.0
             self.lat_look_ahead = 60
-            self.long_look_ahead = 700
+            self.long_look_ahead = 650
 
             self.N = 250
             self.Q = np.array([[0.0001, 0, 0, 0],
@@ -191,6 +187,18 @@ class CustomController(BaseController):
                                [0, 0, 0, 0.0005]])
             self.R = np.array([[4, 0],
                                [0, 0.0001]])
+            # check if need to decelerate
+            dec_look_ahead = 1000
+            idx_next = nn_idx + dec_look_ahead
+            if idx_next >= len(trajectory) - 1:
+                idx_next = len(trajectory) - 1
+            X_long_next_ = trajectory[idx_next][0]
+            Y_long_next_ = trajectory[idx_next][1]
+            psi_long_ = math.atan2(Y_long_next_ - Y, X_long_next_ - X)
+            error_psi_ = self.wrapAngle(psi_long_) - self.wrapAngle(psi)
+            if np.abs(error_psi_) > 15*math.pi/180:
+                print("dec!", np.abs(error_psi_))
+                longi_scale = 0.5
         elif np.abs(error_psi_long) < 30 * math.pi / 180:  # curb
             # print("small angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_small_angle += 1
@@ -209,7 +217,6 @@ class CustomController(BaseController):
             self.R = np.array([[3, 0],
                                [0, 0.0001]])
         elif np.abs(error_psi_long) < 45 * math.pi / 180:  # medium
-            print("median angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
             self.XTE_medium_angle += XTE
 
@@ -226,7 +233,6 @@ class CustomController(BaseController):
             self.R = np.array([[3, 0],
                                [0, 0.0001]])
         elif np.abs(error_psi_long) < 55 * math.pi / 180:  # medium
-            print("median-large angle is", np.abs(error_psi_long)*180/math.pi)
             self.cnt_medium_angle += 1
             self.XTE_medium_angle += XTE
 
