@@ -48,7 +48,7 @@ class CustomController(BaseController):
         self.sum_error_psi = 0.0
         self.error_psi_old = 0.0
 
-        self.long_look_ahead = 650
+        self.long_look_ahead = 550
         self.lat_look_ahead = 80
 
         # lateral
@@ -178,7 +178,6 @@ class CustomController(BaseController):
             longi_scale = 4.0
             self.kd_x = 5.0
             self.lat_look_ahead = 60
-            self.long_look_ahead = 600
 
             self.N = 250
             self.Q = np.array([[0.0001, 0, 0, 0],
@@ -207,7 +206,6 @@ class CustomController(BaseController):
             longi_scale = 0.2
             self.kd_x = 2.0
             self.lat_look_ahead = 100
-            self.long_look_ahead = 600
 
             self.N = 250
             self.Q = np.array([[0.0001, 0, 0, 0],
@@ -222,7 +220,6 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 600
             self.lat_look_ahead = 150
 
             self.N = 250
@@ -238,7 +235,6 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 600
             self.lat_look_ahead = 175
 
 
@@ -256,7 +252,6 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 600
             self.lat_look_ahead = 200
 
             self.N = 250
@@ -273,7 +268,6 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 600
             self.lat_look_ahead = 200
 
             self.N = 250
