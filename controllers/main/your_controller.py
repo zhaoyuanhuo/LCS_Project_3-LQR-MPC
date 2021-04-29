@@ -195,7 +195,7 @@ class CustomController(BaseController):
             Y_long_next_ = trajectory[idx_next][1]
             psi_long_ = math.atan2(Y_long_next_ - Y, X_long_next_ - X)
             error_psi_ = self.wrapAngle(psi_long_) - self.wrapAngle(psi)
-            if np.abs(error_psi_) > 15*math.pi/180:
+            if np.abs(error_psi_) > 14*math.pi/180:
                 # print("dec!", np.abs(error_psi_))
                 longi_scale = 0.5
         elif np.abs(error_psi_long) < 30 * math.pi / 180:  # curb
