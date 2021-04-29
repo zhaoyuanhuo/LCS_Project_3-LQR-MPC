@@ -178,14 +178,14 @@ class CustomController(BaseController):
             longi_scale = 4.0
             self.kd_x = 5.0
             self.lat_look_ahead = 60
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
 
             self.N = 250
             self.Q = np.array([[0.0001, 0, 0, 0],
                                [0, 0.0001, 0, 0],
                                [0, 0, 0.001, 0],
                                [0, 0, 0, 0.0005]])
-            self.R = np.array([[4, 0],
+            self.R = np.array([[6, 0],
                                [0, 0.0001]])
             # check if need to decelerate
             dec_look_ahead = 1000
@@ -197,7 +197,7 @@ class CustomController(BaseController):
             psi_long_ = math.atan2(Y_long_next_ - Y, X_long_next_ - X)
             error_psi_ = self.wrapAngle(psi_long_) - self.wrapAngle(psi)
             if np.abs(error_psi_) > 15*math.pi/180:
-                print("dec!", np.abs(error_psi_))
+                # print("dec!", np.abs(error_psi_))
                 longi_scale = 0.5
         elif np.abs(error_psi_long) < 30 * math.pi / 180:  # curb
             # print("small angle is", np.abs(error_psi_long)*180/math.pi)
@@ -207,7 +207,7 @@ class CustomController(BaseController):
             longi_scale = 0.2
             self.kd_x = 2.0
             self.lat_look_ahead = 100
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
 
             self.N = 250
             self.Q = np.array([[0.0001, 0, 0, 0],
@@ -222,7 +222,7 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
             self.lat_look_ahead = 150
 
             self.N = 250
@@ -238,7 +238,7 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
             self.lat_look_ahead = 175
 
 
@@ -256,7 +256,7 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
             self.lat_look_ahead = 200
 
             self.N = 250
@@ -273,7 +273,7 @@ class CustomController(BaseController):
 
             longi_scale = 0.1
             self.kd_x = 0.0
-            self.long_look_ahead = 650
+            self.long_look_ahead = 600
             self.lat_look_ahead = 200
 
             self.N = 250
