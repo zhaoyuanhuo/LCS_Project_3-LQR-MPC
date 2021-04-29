@@ -151,7 +151,7 @@ class CustomController(BaseController):
         X_next_ref /= cnt
         Y_next_ref /= cnt
         psi_ref = math.atan2(Y_next_ref - Y, X_next_ref - X)
-        speed_scale = 1.0
+        speed_scale = 1.1
 
         # longitude lookahead
         #   1. comparing with current psi, to determine if there is a curb ahead
